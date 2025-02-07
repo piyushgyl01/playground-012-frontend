@@ -13,6 +13,7 @@ import App from "./App.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Movies from "./pages/Movies.jsx";
 import AddMovie from "./pages/AddMovie.jsx";
+import EditMovie from "./pages/EditMovie.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/add-movie",
         element: <AddMovie />,
+      },
+      {
+        path: "/movies/:id/:movieName/edit-movie",
+        element: <EditMovie />,
       },
       {
         path: "/movies",

@@ -6,6 +6,7 @@ import {
   getMovieStatus,
   getMovies,
 } from "./movieSlice";
+import { Link } from "react-router";
 
 export default function MovieList() {
   //DELETE ID
@@ -46,8 +47,9 @@ export default function MovieList() {
         {movies.map((movie) => (
           <li className="list-group-item" key={movie._id}>
             {movie.name} by {movie.director} in {movie.genre}
+            <Link className="btn btn-primary btn-sm ms-2" to={`/movies/${movie._id}/${movie.name}/edit-movie`}>Edit</Link>
             <button
-              className="btn btn-danger btn-sm ms-5"
+              className="btn btn-danger btn-sm ms-2"
               onClick={() => handleDelete(movie._id)}
               disabled={deletingId === movie._id}
             >

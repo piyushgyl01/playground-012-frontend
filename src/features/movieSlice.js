@@ -35,6 +35,22 @@ export const postMovies = createAsyncThunk(
   }
 );
 
+export const updateMovie = createAsyncThunk(
+  "movies/updateMovie",
+  async ({ id, formData }) => {
+    try {
+      const response = await axios.put(
+        `https://playground-012-backend.vercel.app/movies/${id}`,
+        formData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Update Error: ", error);
+      throw error;
+    }
+  }
+);
+
 export const deleteMovie = createAsyncThunk(
   "movies/deleteMovie",
   async (id) => {
@@ -59,14 +75,13 @@ export const movieSlice = createSlice({
     error: null,
     addStatus: "idle",
     deleteStatus: "idle",
-    // updateStatus: "idle",
+    updateStatus: "idle",
   },
   reducers: {},
   extraReducers: (Builder) => {
-    Builder
-      .addCase(getMovies.pending, (state) => {
-        state.fetchStatus = "loading";
-      })
+    Builder.addCase(getMovies.pending, (state) => {
+      state.fetchStatus = "loading";
+    })
       .addCase(getMovies.fulfilled, (state, action) => {
         state.fetchStatus = "success";
         state.movies = action.payload;
@@ -84,6 +99,23 @@ export const movieSlice = createSlice({
       })
       .addCase(postMovies.rejected, (state, action) => {
         state.addStatus = "error";
+        state.error = action.error.message;
+      })
+      .addCase(updateMovie.pending, (state) => {
+        state.updateStatus = "loading";
+      })
+      .addCase(updateMovie.fulfilled, (state, action) => {
+        state.updateStatus = "success";
+        const updatedMovie = action.payload.movie;
+        const movieIndex = state.movies.findIndex(
+          (movie) => movie._id === updatedMovie._id
+        );
+        if (movieIndex !== -1) {
+          state.movies[movieIndex] = updatedMovie;
+        }
+      })
+      .addCase(updateMovie.rejected, (state, action) => {
+        state.updateStatus = "error";
         state.error = action.error.message;
       })
       .addCase(deleteMovie.pending, (state) => {
@@ -104,14 +136,17 @@ export const movieSlice = createSlice({
 
 export const getAllMovies = (state) => state.movies.movies;
 export const getMovieStatus = createSelector(
-    state => state.movies.fetchStatus,
-    state => state.movies.addStatus,
-    state => state.movies.deleteStatus,
-    (fetchStatus, addStatus, deleteStatus) => ({
-      fetchStatus,
-      addStatus,
-      deleteStatus
-    })
-  );
-  
+  (state) => state.movies.fetchStatus,
+  (state) => state.movies.addStatus,
+  (state) => state.movies.deleteStatus,
+  (state) => state.movies.updateStatus,
+
+  (fetchStatus, addStatus, deleteStatus, updateStatus) => ({
+    fetchStatus,
+    addStatus,
+    deleteStatus,
+    updateStatus,
+  })
+);
+
 export default movieSlice.reducer;
